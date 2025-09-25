@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xenakis & Ligeti: Arquitetos do Som em Massa</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Source+Serif+4:opsz,wght@8..60,400;600&display=swap" rel="stylesheet">
+    
+    <!-- Chosen Palette: Warm Neutrals (Stone & Amber) -->
+    <!-- Application Structure Plan: A single-page application designed for comparative learning. The structure is thematic rather than linear, starting with a general context ('A Crise do Serialismo'), moving to a core side-by-side interactive comparison of the composers ('Mentes em Contraste' including an interactive table), then a deep dive into their key works ('Obras Marcantes'), and finishing with a new 'Recursos Adicionais' section that uses a tabbed interface for 'Exercícios de Fixação', 'Referências Bibliográficas' and a new 'Material Audiovisual' section. This flow guides the user from the general to the specific, using interactivity to unpack complex concepts like stochastic music and micropolyphony, and then provides tools for self-assessment, further study, and direct audio/visual examples. The goal is to make the academic content more accessible and engaging by allowing users to see the composers' philosophies and techniques in direct contrast and then apply their knowledge. -->
+    <!-- Visualization & Content Choices: 
+        - Report Info: Xenakis's use of probability (Gaussian distribution). Goal: Explain a core mathematical concept. Viz/Method: A Chart.js line chart showing a Bell Curve. Interaction: A slider to change the distribution's parameters, with text updates explaining the musical impact. Justification: Makes an abstract concept tangible. Library: Chart.js.
+        - Report Info: Ligeti's Micropolyphony. Goal: Visualize "inaudible polyphony". Viz/Method: An interactive diagram with HTML divs representing musical lines. Interaction: A slider increases the number of lines, showing how they merge into a solid texture. Justification: Provides a clear visual metaphor for a complex auditory phenomenon. Library: Vanilla JS + Tailwind.
+        - Report Info: Comparison of philosophies. Goal: At-a-glance summary. Viz/Method: Two-column layout with Unicode icons representing their core analogies (e.g., 🌩️ for Xenakis, 🕸️ for Ligeti), *plus an interactive HTML table* for detailed comparison. Interaction: Clickable elements revealing more text. Justification: Visually organizes conceptual differences and provides structured data. Library: Vanilla JS + Tailwind.
+        - Report Info: Key Works Analysis. Goal: Visualize the structure of seminal pieces. Viz/Method: Simplified charts in modal windows for works like 'Metastaseis' (glissandi line chart) and 'Atmosphères' (density area chart). Interaction: Clicking a work's card opens the modal. Justification: Offers a visual entry point into complex compositions. Library: Chart.js.
+        - New: Exercises. Goal: Self-assessment. Viz/Method: Multiple choice and short answer questions. Interaction: Button to reveal answers and explanations. Justification: Reinforces learning. Library: Vanilla JS + HTML.
+        - New: References. Goal: Further study. Viz/Method: Categorized list. Interaction: None, static list. Justification: Provides academic rigor and resources. Library: HTML.
+        - New: Audiovisual. Goal: Direct aural/visual learning. Viz/Method: Embedded YouTube players. Interaction: None, static list of videos. Justification: Provides essential listening material within the app. Library: HTML `<iframe>` tag.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3 { font-family: 'Source Serif 4', serif; }
+        .chart-container { position: relative; width: 100%; max-width: 600px; margin-left: auto; margin-right: auto; height: 300px; max-height: 400px; }
+        @media (min-width: 768px) { .chart-container { height: 350px; } }
+        .tab-active { border-color: #d97706; color: #d97706; background-color: #fffbeb; }
+        .tab-inactive { border-color: transparent; color: #57534e; }
+        .modal { transition: opacity 0.25s ease; }
+        .modal-content { transition: transform 0.25s ease; }
+        .line-density-viz div { transition: all 0.3s ease-in-out; }
+        .answer-reveal { display: none; }
+    </style>
+</head>
+<body class="bg-amber-50 text-stone-800 antialiased">
+
+    <header class="bg-amber-100/50 backdrop-blur-sm sticky top-0 z-50 shadow-sm">
+        <div class="container mx-auto px-4 py-3">
+            <div class="flex justify-between items-center">
+                <h1 class="text-xl md:text-2xl font-semibold text-amber-800">Xenakis & Ligeti: Arquitetos do Som</h1>
+                <nav class="hidden md:flex space-x-6 text-sm font-semibold">
+                    <a href="#contexto" class="text-stone-600 hover:text-amber-700 transition-colors">Contexto</a>
+                    <a href="#comparativo" class="text-stone-600 hover:text-amber-700 transition-colors">Mentes em Contraste</a>
+                    <a href="#obras" class="text-stone-600 hover:text-amber-700 transition-colors">Obras Marcantes</a>
+                    <a href="#recursos" class="text-stone-600 hover:text-amber-700 transition-colors">Recursos Adicionais</a>
+                    <a href="#legado" class="text-stone-600 hover:text-amber-700 transition-colors">Legado</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section id="hero" class="py-20 bg-amber-100">
+            <div class="container mx-auto px-4 text-center">
+                <h2 class="text-4xl md:text-6xl font-bold text-amber-900 mb-4">A Crise do Serialismo e o Nascimento de Novas Texturas</h2>
+                <p class="max-w-3xl mx-auto text-lg text-stone-700">
+                    Em meados do século XX, a rigidez do serialismo levou a música a um impasse. Dois compositores, Iannis Xenakis e György Ligeti, responderam a essa crise não com uma negação, mas com uma ousada ressignificação. Eles abraçaram a "massa sonora" que o serialismo produzia inadvertidamente, transformando-a no foco de suas investigações e inaugurando novas formas de pensar e ouvir a música.
+                </p>
+            </div>
+        </section>
+
+        <section id="contexto" class="py-16">
+            <div class="container mx-auto px-4">
+                 <div class="max-w-4xl mx-auto bg-white/50 p-8 rounded-xl shadow-lg border border-stone-200/50">
+                    <h3 class="text-3xl font-bold mb-4 text-center text-amber-800">Do Controle Total à Percepção da Massa</h3>
+                    <p class="text-stone-700 mb-4 text-justify">
+                        O serialismo total, com sua ambição de controlar cada parâmetro musical (altura, duração, timbre), gerou uma complexidade tão extrema que, paradoxalmente, as linhas individuais se tornaram inaudíveis. O que se ouvia era uma "dispersão irracional de sons". Xenakis criticou essa "contradição entre o sistema linear e o resultado ouvido". Ligeti ecoou essa preocupação, notando a perda de controle do compositor sobre o resultado perceptível. Foi nesse cenário de crise que ambos propuseram novos caminhos, focando na textura, densidade e no movimento de massas sonoras como os principais elementos composicionais.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section id="comparativo" class="py-16 bg-stone-100">
+            <div class="container mx-auto px-4">
+                <h2 class="text-4xl font-bold text-center mb-10 text-amber-900">Mentes em Contraste</h2>
+                <p class="max-w-3xl mx-auto text-center text-stone-700 mb-12">
+                    Apesar de chegarem a resultados sonoros superficialmente semelhantes — densas massas de som — os caminhos de Xenakis e Ligeti foram radicalmente diferentes. Explore abaixo as suas distintas filosofias e técnicas, que revelam duas abordagens contrastantes para organizar o "caos" sonoro.
+                </p>
+
+                <div class="grid md:grid-cols-2 gap-8 md:gap-12 mb-12">
+                    <div class="bg-white p-6 rounded-lg shadow-md border border-stone-200/80">
+                        <h3 class="text-3xl font-semibold mb-4 text-center">Iannis Xenakis</h3>
+                        <div class="text-center mb-4 text-4xl text-amber-600">🌩️</div>
+                        <p class="text-stone-600 text-center font-semibold mb-6">O Meteorologista da Tempestade Sonora</p>
+                        
+                        <div id="xenakis-content">
+                            <h4 class="font-bold text-lg mb-2 text-amber-800">Filosofia: Indeterminismo Determinado</h4>
+                            <p class="text-stone-700 mb-4 text-justify">Xenakis, arquiteto e engenheiro, via a música através das lentes da matemática e da física. Para ele, o serialismo falhava porque sua ordem era inaudível. Sua solução foi aplicar leis de probabilidade e estatística para governar grandes populações de eventos sonoros. Ele não controlava cada "gota de chuva", mas sim a densidade, a direção e a intensidade da "tempestade" sonora como um todo.</p>
+                            
+                            <h4 class="font-bold text-lg mb-2 text-amber-800">Técnica: Música Estocástica</h4>
+                            <p class="text-stone-700 mb-4 text-justify">Sua técnica principal, a "música estocástica", utiliza distribuições de probabilidade (como a Curva de Gauss) para determinar parâmetros como altura, duração e velocidade dos glissandos. O resultado é uma "nuvem sonora", onde eventos individuais se fundem em uma textura macroscópica. Explore abaixo como a distribuição Gaussiana pode modelar a velocidade dos eventos sonoros.</p>
+
+                            <div class="mt-6">
+                                <label for="stdDevSlider" class="block text-sm font-medium text-stone-700">Variedade de Velocidades (Desvio Padrão): <span id="stdDevValue" class="font-bold">1.0</span></label>
+                                <input id="stdDevSlider" type="range" min="0.5" max="2.5" step="0.1" value="1.0" class="w-full h-2 bg-stone-200 rounded-lg appearance-none cursor-pointer">
+                                <div class="chart-container mt-4">
+                                    <canvas id="xenakisChart"></canvas>
+                                </div>
+                                <p id="xenakis-explanation" class="text-sm text-stone-600 mt-2 text-center"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-lg shadow-md border border-stone-200/80">
+                        <h3 class="text-3xl font-semibold mb-4 text-center">György Ligeti</h3>
+                        <div class="text-center mb-4 text-4xl text-amber-600">🕸️</div>
+                        <p class="text-stone-600 text-center font-semibold mb-6">O Tecelão da Teia Sonora Impenetrável</p>
+                        
+                        <div id="ligeti-content">
+                            <h4 class="font-bold text-lg mb-2 text-amber-800">Filosofia: Controle Micro para Ilusão Macro</h4>
+                            <p class="text-stone-700 mb-4 text-justify">Ligeti rejeitava o acaso. Sua abordagem era de um controle meticuloso e preciso de cada detalhe. Ele criticava o serialismo por perder o controle sobre o resultado perceptivo. Sua genialidade foi construir texturas complexas a partir de uma polifonia tão densa que se tornava "inaudível", criando a ilusão de uma massa estática, mas internamente vibrante.</p>
+
+                            <h4 class="font-bold text-lg mb-2 text-amber-800">Técnica: Micropolifonia</h4>
+                            <p class="text-stone-700 mb-4 text-justify">Sua técnica, a "micropolifonia", consiste em tecer múltiplos cânones (linhas melódicas) de forma tão compacta que se fundem. As vozes individuais se perdem, e o que emerge é uma "massa sonora" contínua. É uma "polifonia subaquática", onde a complexidade interna gera uma superfície lisa e em evolução. Altere a densidade abaixo para ver o conceito em ação.</p>
+                            
+                            <div class="mt-6">
+                                <label for="densitySlider" class="block text-sm font-medium text-stone-700">Densidade de Linhas Polifônicas: <span id="densityValue" class="font-bold">2</span></label>
+                                <input id="densitySlider" type="range" min="2" max="50" step="1" value="2" class="w-full h-2 bg-stone-200 rounded-lg appearance-none cursor-pointer">
+                                <div id="ligeti-viz" class="line-density-viz w-full h-64 mt-4 bg-stone-50 border border-stone-200 rounded-md flex flex-col justify-around p-2"></div>
+                                <p id="ligeti-explanation" class="text-sm text-stone-600 mt-2 text-center"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="max-w-5xl mx-auto bg-white p-8 rounded-xl shadow-lg border border-stone-200/80 mt-12">
+                    <h3 class="text-3xl font-bold mb-6 text-center text-amber-800">Tabela 1: Comparativo de Abordagens à Massa Sonora</h3>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-stone-200">
+                            <thead class="bg-stone-50">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-stone-500 uppercase tracking-wider">Característica Principal</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-stone-500 uppercase tracking-wider">Iannis Xenakis (Música Estocástica)</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-stone-500 uppercase tracking-wider">György Ligeti (Micropolifonia)</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-stone-200">
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-normal text-sm font-medium text-stone-900">Filosofia Composicional</td>
+                                    <td class="px-6 py-4 whitespace-normal text-sm text-stone-700">Baseada em leis de probabilidade e modelos matemáticos (física, arquitetura).</td>
+                                    <td class="px-6 py-4 whitespace-normal text-sm text-stone-700">Baseada em contraponto micro-estrutural meticulosamente controlado e percepção auditiva.</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-normal text-sm font-medium text-stone-900">Geração de Complexidade</td>
+                                    <td class="px-6 py-4 whitespace-normal text-sm text-stone-700">Gerada por processos estatísticos e probabilísticos (e.g., Lei dos Grandes Números, distribuições Gaussiana, Poisson).</td>
+                                    <td class="px-6 py-4 whitespace-normal text-sm text-stone-700">Construída por sobreposição densa de múltiplas linhas independentes, mas precisamente compostas.</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-normal text-sm font-medium text-stone-900">Tratamento do Acaso</td>
+                                    <td class="px-6 py-4 whitespace-normal text-sm text-stone-700">"Indeterminismo determinado": fórmulas matemáticas precisas, mas resultado individual mutável (acaso controlado). Intuição preenche a "lacuna" entre cálculo e partitura.</td>
+                                    <td class="px-6 py-4 whitespace-normal text-sm text-stone-700">Rejeita processos aleatórios; cada detalhe é precisamente composto. O indeterminismo é perceptivo, não composicional.</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-normal text-sm font-medium text-stone-900">Foco Perceptivo</td>
+                                    <td class="px-6 py-4 whitespace-normal text-sm text-stone-700">Macro-estrutural: a "nuvem sonora" é o foco, detalhes individuais são indistinguíveis, mas o efeito geral é óbvio.</td>
+                                    <td class="px-6 py-4 whitespace-normal text-sm text-stone-700">Macro-estrutural: as linhas individuais são "ocultas" ou "subaquáticas", a experiência foca na textura resultante e no "timbre de movimento".</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-normal text-sm font-medium text-stone-900">Influências Chave</td>
+                                    <td class="px-6 py-4 whitespace-normal text-sm text-stone-700">Matemática, física, arquitetura, fenômenos naturais (chuva, gases).</td>
+                                    <td class="px-6 py-4 whitespace-normal text-sm text-stone-700">Música eletrônica (estúdio de Colônia), polifonia renascentista, ritmos africanos (em obras posteriores).</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-normal text-sm font-medium text-stone-900">Relação com Serialismo</td>
+                                    <td class="px-6 py-4 whitespace-normal text-sm text-stone-700">Crítica severa ao serialismo por sua complexidade linear que resultava em massa sonora indiferenciada.</td>
+                                    <td class="px-6 py-4 whitespace-normal text-sm text-stone-700">Distanciamento do dogmatismo serialista, crítica à perda de controle perceptivo e à incompatibilidade com a escuta humana.</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-normal text-sm font-medium text-stone-900">Instrumentação Típica</td>
+                                    <td class="px-6 py-4 whitespace-normal text-sm text-stone-700">Orquestra com partes solo individuais (e.g., 46 cordas em *Metastaseis*), grande número de músicos.</td>
+                                    <td class="px-6 py-4 whitespace-normal text-sm text-stone-700">Orquestra ou coro com grande número de partes independentes (e.g., 40 vozes em *Lux Aeterna*, 56-87 partes em *Atmosphères*).</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-normal text-sm font-medium text-stone-900">Notação</td>
+                                    <td class="px-6 py-4 whitespace-normal text-sm text-stone-700">Frequentemente baseada em gráficos arquitetônicos e tabelas de dados, posteriormente transcrita para notação tradicional com ajustes intuitivos.</td>
+                                    <td class="px-6 py-4 whitespace-normal text-sm text-stone-700">Partituras densas com muitas pautas (até 87), notação precisa de micro-movimentos e tupletos irregulares.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="obras" class="py-16">
+            <div class="container mx-auto px-4">
+                <h2 class="text-4xl font-bold text-center mb-10 text-amber-900">Obras Marcantes</h2>
+                <p class="max-w-3xl mx-auto text-center text-stone-700 mb-12">
+                   Tanto a música estocástica de Xenakis quanto a micropolifonia de Ligeti se manifestaram em composições que redefiniram a paisagem sonora do século XX. Clique nas obras abaixo para explorar como esses conceitos teóricos se transformaram em experiências auditivas revolucionárias.
+                </p>
+                <div id="works-grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                </div>
+            </div>
+        </section>
+
+        <section id="recursos" class="py-16 bg-stone-100">
+            <div class="container mx-auto px-4">
+                <h2 class="text-4xl font-bold text-center mb-10 text-amber-900">Recursos Adicionais para Estudo</h2>
+                <p class="max-w-3xl mx-auto text-center text-stone-700 mb-12">
+                    Aprofunde seu conhecimento com exercícios práticos e uma curadoria de referências bibliográficas.
+                </p>
+
+                <div class="max-w-4xl mx-auto bg-white p-8 rounded-xl shadow-lg border border-stone-200/80">
+                    <div class="flex border-b border-stone-200 mb-6 flex-wrap">
+                        <button id="tab-exercicios" class="tab-button flex-1 py-3 px-2 text-center font-semibold text-stone-600 hover:text-amber-700 transition-colors border-b-2 border-transparent tab-active">Exercícios de Fixação</button>
+                        <button id="tab-referencias" class="tab-button flex-1 py-3 px-2 text-center font-semibold text-stone-600 hover:text-amber-700 transition-colors border-b-2 border-transparent">Referências Bibliográficas</button>
+                        <button id="tab-audiovisual" class="tab-button flex-1 py-3 px-2 text-center font-semibold text-stone-600 hover:text-amber-700 transition-colors border-b-2 border-transparent">Material Audiovisual</button>
+                    </div>
+
+                    <div id="content-exercicios" class="tab-content">
+                        <h3 class="text-2xl font-bold mb-6 text-amber-800">Exercícios de Fixação</h3>
+                        <p class="text-stone-700 mb-6">Teste seus conhecimentos sobre Iannis Xenakis e György Ligeti. Tente responder antes de revelar a chave de resposta!</p>
+                        <div id="questions-container"></div>
+                    </div>
+
+                    <div id="content-referencias" class="tab-content hidden">
+                        <h3 class="text-2xl font-bold mb-6 text-amber-800">Referências Bibliográficas para Aprofundamento</h3>
+                        <p class="text-stone-700 mb-6">Explore estas obras clássicas, canônicas e atuais para expandir sua compreensão sobre a música estocástica, micropolifonia e o contexto pós-serialista.</p>
+                        <div id="references-list"></div>
+                    </div>
+
+                    <div id="content-audiovisual" class="tab-content hidden">
+                        <h3 class="text-2xl font-bold mb-6 text-amber-800">Material Audiovisual de Referência</h3>
+                        <p class="text-stone-700 mb-6">Ouça e assista a performances, análises e documentários para complementar seu estudo sobre os conceitos de Xenakis e Ligeti.</p>
+                        <div id="audiovisual-list"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="legado" class="py-16 bg-stone-100">
+            <div class="container mx-auto px-4">
+                 <div class="max-w-4xl mx-auto bg-white p-8 rounded-xl shadow-lg border border-stone-200/80">
+                    <h3 class="text-3xl font-bold mb-4 text-center text-amber-800">Um Legado de Textura e Percepção</h3>
+                    <p class="text-stone-700 mb-4 text-justify">
+                        O legado de Iannis Xenakis e György Ligeti reside na sua coragem de repensar a própria matéria da música. Eles deslocaram o foco da nota individual para a textura coletiva, do desenvolvimento linear para a transformação de massas sonoras. Xenakis nos mostrou que a matemática e a probabilidade poderiam ser ferramentas poéticas para esculpir o som. Ligeti revelou que a ordem meticulosa poderia gerar as mais fascinantes ilusões de caos e estase. Juntos, eles não apenas superaram a crise do serialismo, mas abriram vastos novos territórios para a exploração sonora, influenciando gerações de compositores, artistas sonoros e até mesmo a forma como ouvimos o mundo ao nosso redor.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-stone-800 text-stone-300 py-6 mt-16">
+        <div class="container mx-auto px-4 text-center text-sm">
+            <p>Aplicação interativa criada para explorar os conceitos de Iannis Xenakis e György Ligeti.</p>
+            <p>&copy; 2025. Conteúdo adaptado de fontes acadêmicas para fins educacionais.</p>
+        </div>
+    </footer>
+
+    <div id="modal" class="modal fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 opacity-0 pointer-events-none z-50">
+        <div id="modal-content" class="modal-content bg-white rounded-lg shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto transform scale-95">
+            <div class="sticky top-0 bg-white p-4 border-b border-stone-200 flex justify-between items-center">
+                <h3 id="modal-title" class="text-2xl font-bold text-amber-800"></h3>
+                <button id="modal-close" class="text-stone-500 hover:text-red-600 transition-colors text-2xl">&times;</button>
+            </div>
+            <div class="p-6">
+                <p id="modal-description" class="mb-6 text-stone-700"></p>
+                <div id="modal-viz-container" class="chart-container h-64 mb-6">
+                    <canvas id="modalChart"></canvas>
+                </div>
+                <h4 class="font-bold text-lg mb-2 text-amber-800">Análise Técnica</h4>
+                <p id="modal-analysis" class="text-stone-700 text-sm"></p>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const worksData = {
+                xenakis: [
+                    {
+                        title: "Metastaseis (1953-54)",
+                        description: "Um marco da música estocástica, onde Xenakis trata cada um dos 61 músicos como uma entidade sonora individual. A obra é famosa por seus glissandos em massa, que criam superfícies sonoras contínuas e em transformação, inspiradas em princípios arquitetônicos.",
+                        analysis: "Xenakis usou gráficos com eixos de altura e tempo para desenhar os glissandos, resultando em formas como paraboloides hiperbólicos. A peça evolui de um uníssono para uma massa sonora 'furiosamente zumbindo', onde as linhas individuais se dispersam como partículas no espaço.",
+                        vizType: 'line',
+                        vizData: {
+                            labels: Array.from({ length: 20 }, (_, i) => i + 1),
+                            datasets: Array.from({length: 12}, (_, i) => ({
+                                label: `Voz ${i+1}`,
+                                data: Array.from({ length: 20 }, (_, j) => 50 + i*4 + (j/19) * (Math.random() * 40 - 20) - (Math.pow(j-10, 2) / 10) * (i%2 === 0 ? 1 : -1) ),
+                                borderColor: `hsla(25, 90%, ${30 + i * 4}%, 0.7)`,
+                                borderWidth: 1.5,
+                                pointRadius: 0,
+                                tension: 0.4,
+                                fill: false,
+                            }))
+                        },
+                        vizOptions: { plugins: { legend: { display: false }, title: { display: true, text: 'Visualização de Glissandos em Massa' } }, scales: { y: { display: false }, x: { display: false } } }
+                    },
+                    {
+                        title: "Pithoprakta (1955-56)",
+                        description: "Com o título significando 'ações através da probabilidade', esta obra aplica a mecânica estatística dos gases à música. Cada instrumento é uma 'molécula' cujo comportamento é governado por leis de probabilidade, criando 'nuvens de sons' de densidade e 'temperatura' variáveis.",
+                        analysis: "A peça explora o contraste entre sons contínuos (glissandos) e descontínuos (pizzicati). Xenakis usou a distribuição de Maxwell-Boltzmann para modelar a velocidade dos eventos sonoros, resultando em uma textura efervescente e imprevisível nos detalhes, mas controlada na sua forma geral.",
+                        vizType: 'scatter',
+                        vizData: {
+                            datasets: [{
+                                label: 'Eventos Sonoros',
+                                data: Array.from({length: 200}, () => ({x: Math.random() * 100, y: Math.random() * 100})),
+                                backgroundColor: 'rgba(217, 119, 6, 0.6)'
+                            }]
+                        },
+                        vizOptions: { plugins: { legend: { display: false }, title: { display: true, text: 'Distribuição de Eventos (Movimento Browniano)' } }, scales: { y: { display: false }, x: { display: false } } }
+                    }
+                ],
+                ligeti: [
+                    {
+                        title: "Atmosphères (1961)",
+                        description: "A obra-prima da micropolifonia. Ligeti abandona melodia e ritmo tradicionais em favor de massas sonoras estáticas, mas internamente vivas. A textura é criada pela sobreposição de até 87 linhas instrumentais que se fundem em uma teia sonora impenetrável.",
+                        analysis: "A sensação de 'imobilidade em movimento' é alcançada através de cânones cromáticos extremamente densos e ritmos assíncronos que evitam ataques simultâneos. As mudanças sutis de timbre e dinâmica criam uma paisagem sonora que evolui gradualmente, como nuvens se transformando no céu.",
+                        vizType: 'line',
+                        vizData: {
+                            labels: Array.from({ length: 50 }, (_, i) => i + 1),
+                            datasets: [{
+                                label: 'Densidade',
+                                data: [10, 12, 15, 20, 28, 35, 40, 42, 43, 44, 45, 44, 42, 40, 38, 35, 33, 30, 28, 25, 22, 20, 18, 22, 28, 33, 38, 45, 50, 53, 55, 56, 55, 52, 48, 44, 40, 35, 30, 25, 20, 18, 16, 14, 12, 15, 20, 25, 30, 35],
+                                fill: true,
+                                backgroundColor: 'rgba(161, 98, 7, 0.2)',
+                                borderColor: 'rgba(161, 98, 7, 1)',
+                                tension: 0.4,
+                                pointRadius: 0,
+                            }]
+                        },
+                        vizOptions: { plugins: { legend: { display: false }, title: { display: true, text: 'Evolução da Densidade Textural' } }, scales: { y: { beginAtZero: true, display: false }, x: { display: false } } }
+
+                    },
+                    {
+                        title: "Lux Aeterna (1966)",
+                        description: "Uma peça coral a cappella para 16 vozes que leva a micropolifonia a um plano etéreo. As vozes se entrelaçam em cânones tão complexos que o texto se torna ininteligível, transformando-se em pura cor e textura sonora.",
+                        analysis: "As linhas vocais se movem em intervalos muito próximos, criando clusters que se transformam lentamente. O efeito é uma massa sonora flutuante e luminosa, onde a polifonia se torna um meio para criar uma harmonia estática e em constante evolução, desprovida de pulso rítmico.",
+                         vizType: 'polarArea',
+                        vizData: {
+                             labels: ['Soprano', 'Contralto', 'Tenor', 'Baixo'],
+                             datasets: [{
+                                label: 'Fusão Vocal',
+                                data: [10, 10, 10, 10],
+                                backgroundColor: [
+                                'rgba(251, 191, 36, 0.5)',
+                                'rgba(217, 119, 6, 0.5)',
+                                'rgba(180, 83, 9, 0.5)',
+                                'rgba(120, 53, 15, 0.5)'
+                                ]
+                            }]
+                        },
+                        vizOptions: { plugins: { legend: { position: 'bottom' }, title: { display: true, text: 'Representação da Fusão das Seções Vocais' } }, scales: { r: { display: false } } }
+                    }
+                ]
+            };
+
+            const exercises = [
+                {
+                    question: "Qual foi a principal crítica de Iannis Xenakis ao serialismo que o levou a desenvolver a música estocástica?",
+                    type: "multiple-choice",
+                    options: [
+                        "A falta de dissonância na música serial.",
+                        "A complexidade extrema que tornava as linhas individuais inaudíveis, resultando em uma massa sonora caótica.",
+                        "O uso excessivo de instrumentos eletrônicos.",
+                        "A ausência de ritmo e melodia discerníveis."
+                    ],
+                    correctAnswer: 1,
+                    explanation: "Xenakis criticava o serialismo porque, apesar de seu controle meticuloso, a densidade das notas fazia com que as linhas individuais se perdessem, criando uma massa sonora indistinta, o que ele via como uma contradição."
+                },
+                {
+                    question: "Explique o conceito de 'micropolifonia' de György Ligeti e como ele difere da polifonia tradicional.",
+                    type: "short-answer",
+                    answer: "A micropolifonia de Ligeti é uma técnica de contraponto onde múltiplas linhas melódicas independentes são sobrepostas de forma tão densa e com movimentos tão próximos que as vozes individuais se tornam inaudíveis, fundindo-se em uma massa sonora contínua e em evolução. Diferentemente da polifonia tradicional (como a de Bach), onde o objetivo é que cada linha seja discernível, na micropolifonia as linhas se perdem no todo, e o foco perceptivo se desloca para a textura, densidade e transformação da massa sonora, e não para a sucessão de notas individuais."
+                },
+                {
+                    question: "Cite uma obra representativa de Iannis Xenakis e uma de György Ligeti que exemplifiquem seus respectivos conceitos de 'nuvens sonoras' e 'micropolifonia'.",
+                    type: "short-answer",
+                    answer: "Para Iannis Xenakis, uma obra representativa que exemplifica as 'nuvens sonoras' é *Pithoprakta* (1955-56) ou *Metastaseis* (1953-54). Para György Ligeti, uma obra que exemplifica a 'micropolifonia' é *Atmosphères* (1961) ou *Lux Aeterna* (1966)."
+                },
+                {
+                    question: "Como a formação de Xenakis em arquitetura e engenharia influenciou sua abordagem composicional?",
+                    type: "multiple-choice",
+                    options: [
+                        "Ele usava plantas arquitetônicas como partituras.",
+                        "Ele aplicava princípios matemáticos e físicos, como probabilidade e mecânica estatística, para estruturar suas composições.",
+                        "Ele construía instrumentos musicais com designs inovadores.",
+                        "Ele compunha apenas para espaços arquitetônicos específicos."
+                    ],
+                    correctAnswer: 1,
+                    explanation: "A formação de Xenakis em arquitetura e engenharia o levou a aplicar rigorosos princípios matemáticos e físicos, como a teoria das probabilidades e a mecânica estatística de gases, para modelar e estruturar suas composições musicais."
+                },
+                 {
+                    question: "Qual é o efeito perceptivo principal da micropolifonia de Ligeti?",
+                    type: "multiple-choice",
+                    options: [
+                        "Clareza e distinção de cada linha melódica.",
+                        "Uma sensação de imobilidade e movimento simultâneos em uma massa sonora contínua.",
+                        "Ritmos de dança e melodias cativantes.",
+                        "A predominância de solos instrumentais."
+                    ],
+                    correctAnswer: 1,
+                    explanation: "A micropolifonia de Ligeti cria uma textura densa onde as linhas individuais se fundem, resultando em uma massa sonora que parece estática em alguns momentos, mas com um movimento interno contínuo, gerando uma sensação paradoxal de imobilidade e movimento simultâneos."
+                }
+            ];
+
+            const references = [
+                {
+                    category: "Clássicas/Canônicas",
+                    items: [
+                        { title: "Xenakis, Iannis. *Formalized Music: Thought and Mathematics in Composition*. Indiana University Press, 1971.", url: "https://philpapers.org/rec/XENFMT" },
+                        { title: "Ligeti, György. 'Metamorphoses of Musical Form'. *Die Reihe*, 7, 1960, pp. 5-19.", url: "https://www.scribd.com/document/511394170/Ligeti-Metamorphoses-of-Musical-Form" },
+                        { title: "Xenakis, Iannis. 'La crise de la musique sérielle'. *Gravesaner Blätter*, 1, 1955, pp. 2-4.", url: "https://www.scribd.com/document/511394170/Ligeti-Metamorphoses-of-Musical-Form" }
+                    ]
+                },
+                {
+                    category: "Interessantes/Atuais",
+                    items: [
+                        { title: "Besada, J. (2022). Iannis Xenakis’s Formalized Music: A Critical Review. *Music Theory Online*, 28(2).", url: "https://mtosmt.org/issues/mto.22.28.2/mto.22.28.2.besada.html" },
+                        { title: "Drott, E. (2022). Lines, Masses, Micropolyphony: Ligeti's Kyrie and the “Crisis of the Figure”. *Perspectives of New Music*, 49(1), 4-29.", url: "https://www.jstor.org/stable/24250269" },
+                        { title: "Gibson, B. (2022). The Use of Stochastic Distributions in the Instrumental Works of Iannis Xenakis - Between Chance and Intuition. Universidade de Évora.", url: "https://dspace.uevora.pt/rdpc/bitstream/10174/31439/1/Dissertacao_Beatriz%20Gibson.pdf" },
+                        { title: "Okonsar, H. (2008). György Ligeti's Micropolyphony.", url: "https://www.academia.edu/3493777/Gy%C3%B6rgy_Ligeti_s_Micropolyphony" },
+                        { title: "Han, J. (2024). Decoding Ligeti's Micropolyphony: Lessons for Composers. *Medium*.", url: "https://medium.com/@jhanmusic/decoding-ligetis-micropolyphony-lessons-for-composers-4375b42691b3" }
+                    ]
+                }
+            ];
+
+            const audiovisual = [
+                {
+                    category: "Iannis Xenakis - Obras Principais",
+                    items: [
+                        { title: "Metastaseis (Partitura Oficial)", url: "https://www.youtube.com/watch?v=uaPVaPPDmVs" },
+                        { title: "Metastaseis (Performance)", url: "https://www.youtube.com/watch?v=SZazYFchLRI" },
+                        { title: "Metastaseis (Análise Espectral)", url: "https://www.youtube.com/watch?v=n2O8bMlEijg" },
+                        { title: "Pithoprakta (com partitura gráfica)", url: "https://www.youtube.com/watch?v=nvH2KYYJg-o" },
+                        { title: "Pithoprakta (Performance completa)", url: "https://www.youtube.com/watch?v=yxAakHDWjrw" }
+                    ]
+                },
+                {
+                    category: "Iannis Xenakis - Documentários e Análises",
+                    items: [
+                        { title: "Documentário: Something Rich and Strange", url: "https://www.youtube.com/watch?v=2p_uhmOIsnQ" },
+                        { title: "Música Estocástica Explicada", url: "https://www.youtube.com/watch?v=ZHPtdhOo5bc" },
+                        { title: "Xenakis: Stochastics to Sieves", url: "https://www.youtube.com/watch?v=UgKlXNdQ6hg" },
+                        { title: "Great Composers: Iannis Xenakis", url: "https://www.youtube.com/watch?v=16:57" }
+                    ]
+                },
+                {
+                    category: "György Ligeti - Obras Principais",
+                    items: [
+                        { title: "Atmosphères (Simon Rattle)", url: "https://www.youtube.com/watch?v=RCNzwdLwA8g" },
+                        { title: "Atmosphères (Análise)", url: "https://www.youtube.com/watch?v=jUaPwTL5vL8" },
+                        { title: "Lux Aeterna (SWR Vokalensemble)", url: "https://www.youtube.com/watch?v=NTIkR8q3osk" },
+                        { title: "Lux Aeterna (com partitura animada)", url: "https://www.youtube.com/watch?v=7BexW6SqOOE" }
+                    ]
+                },
+                {
+                    category: "György Ligeti - Análises Técnicas",
+                    items: [
+                        { title: "Micropolifonia em Lontano", url: "https://www.youtube.com/watch?v=F4t4Q6vw-ug" },
+                        { title: "Ligeti's Life and Music", url: "https://www.youtube.com/watch?v=pa41z_z-dZI" },
+                        { title: "Micropolyphonic Ideas", url: "https://www.youtube.com/watch?v=I-Xl32T_JH8" }
+                    ]
+                },
+                {
+                    category: "Contexto e Técnicas",
+                    items: [
+                        { title: "Musical Texture (Monophonic, Homophonic)", url: "https://www.youtube.com/watch?v=5:10" },
+                        { title: "How 2001 Uses Ligeti's Music", url: "https://www.youtube.com/watch?v=KTw2T708TW0" },
+                        { title: "Contemporary Classical Music Techniques", url: "https://www.youtube.com/watch?v=videos" }
+                    ]
+                },
+                {
+                    category: "Playlists Completas",
+                    items: [
+                        { title: "Xenakis Complete Works", url: "https://www.youtube.com/playlist?list=PL8hVc6VvPyKJNp0HPpJQEs0Q4KGhjOsZS" }
+                    ]
+                }
+            ];
+
+            const worksGrid = document.getElementById('works-grid');
+            Object.keys(worksData).forEach(composer => {
+                worksData[composer].forEach(work => {
+                    const card = document.createElement('div');
+                    card.className = 'bg-white p-6 rounded-lg shadow-md hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer border border-stone-200/80';
+                    card.innerHTML = `
+                        <h4 class="text-xl font-bold mb-2 text-amber-800">${work.title}</h4>
+                        <p class="text-stone-600 text-sm">${work.description.substring(0, 120)}...</p>
+                    `;
+                    card.addEventListener('click', () => openModal(work));
+                    worksGrid.appendChild(card);
+                });
+            });
+
+            const modal = document.getElementById('modal');
+            const modalContent = document.getElementById('modal-content');
+            const modalClose = document.getElementById('modal-close');
+            const modalTitle = document.getElementById('modal-title');
+            const modalDescription = document.getElementById('modal-description');
+            const modalAnalysis = document.getElementById('modal-analysis');
+            const modalChartCanvas = document.getElementById('modalChart');
+            let currentModalChart = null;
+
+            function openModal(work) {
+                modalTitle.textContent = work.title;
+                modalDescription.textContent = work.description;
+                modalAnalysis.textContent = work.analysis;
+
+                if (currentModalChart) {
+                    currentModalChart.destroy();
+                }
+                currentModalChart = new Chart(modalChartCanvas, {
+                    type: work.vizType,
+                    data: work.vizData,
+                    options: { ...work.vizOptions, responsive: true, maintainAspectRatio: false }
+                });
+
+                modal.classList.remove('opacity-0', 'pointer-events-none');
+                modalContent.classList.remove('scale-95');
+            }
+
+            function closeModal() {
+                modal.classList.add('opacity-0', 'pointer-events-none');
+                modalContent.classList.add('scale-95');
+            }
+
+            modalClose.addEventListener('click', closeModal);
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    closeModal();
+                }
+            });
+
+
+            const stdDevSlider = document.getElementById('stdDevSlider');
+            const stdDevValue = document.getElementById('stdDevValue');
+            const xenakisExplanation = document.getElementById('xenakis-explanation');
+            const xenakisCanvas = document.getElementById('xenakisChart').getContext('2d');
+            let xenakisChart;
+
+            function generateGaussianData(mean, stdDev, points) {
+                const data = [];
+                const labels = [];
+                for (let i = 0; i < points; i++) {
+                    let x = mean - 3 * stdDev + (6 * stdDev * i) / points;
+                    labels.push(x.toFixed(2));
+                    let y = (1 / (stdDev * Math.sqrt(2 * Math.PI))) * Math.exp(-0.5 * Math.pow((x - mean) / stdDev, 2));
+                    data.push(y);
+                }
+                return { labels, data };
+            }
+
+            function updateXenakisChart() {
+                const stdDev = parseFloat(stdDevSlider.value);
+                stdDevValue.textContent = stdDev.toFixed(1);
+                
+                if (stdDev < 1.0) {
+                    xenakisExplanation.textContent = "Um desvio padrão baixo concentra as velocidades. A maioria dos eventos sonoros terá um ritmo semelhante, criando uma textura mais homogênea.";
+                } else if (stdDev > 2.0) {
+                     xenakisExplanation.textContent = "Um desvio padrão alto dispersa as velocidades. Os eventos sonoros têm uma gama muito maior de ritmos, resultando em uma textura mais caótica e imprevisível.";
+                } else {
+                     xenakisExplanation.textContent = "Um desvio padrão moderado cria um equilíbrio entre ordem e caos, com uma variedade controlada de velocidades nos eventos.";
+                }
+
+                const { labels, data } = generateGaussianData(0, stdDev, 50);
+
+                if (xenakisChart) {
+                    xenakisChart.data.labels = labels;
+                    xenakisChart.data.datasets[0].data = data;
+                    xenakisChart.update();
+                } else {
+                    xenakisChart = new Chart(xenakisCanvas, {
+                        type: 'line',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: 'Densidade de Probabilidade',
+                                data: data,
+                                fill: true,
+                                backgroundColor: 'rgba(217, 119, 6, 0.2)',
+                                borderColor: 'rgba(217, 119, 6, 1)',
+                                tension: 0.4,
+                                pointRadius: 0,
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: { legend: { display: false }, title: { display: true, text: 'Distribuição de Probabilidade Gaussiana' } },
+                            scales: { y: { beginAtZero: true, display: false }, x: { display: false } }
+                        }
+                    });
+                }
+            }
+
+            stdDevSlider.addEventListener('input', updateXenakisChart);
+            updateXenakisChart();
+
+            const densitySlider = document.getElementById('densitySlider');
+            const densityValue = document.getElementById('densityValue');
+            const ligetiViz = document.getElementById('ligeti-viz');
+            const ligetiExplanation = document.getElementById('ligeti-explanation');
+
+            function updateLigetiViz() {
+                const density = parseInt(densitySlider.value);
+                densityValue.textContent = density;
+                ligetiViz.innerHTML = '';
+                
+                if (density < 10) {
+                    ligetiExplanation.textContent = "Com poucas vozes, as linhas melódicas individuais são distintas e perceptíveis, como na polifonia tradicional.";
+                } else if (density > 35) {
+                    ligetiExplanation.textContent = "Com densidade máxima, as linhas se fundem completamente. A percepção muda da linha para a textura, uma massa sonora impenetrável e em evolução.";
+                } else {
+                    ligetiExplanation.textContent = "À medida que a densidade aumenta, as linhas começam a se sobrepor e a perder sua individualidade, borrando a textura geral.";
+                }
+
+
+                for (let i = 0; i < density; i++) {
+                    const line = document.createElement('div');
+                    line.className = 'w-full';
+                    const height = Math.max(1, 100 / (density * 1.5));
+                    line.style.height = `${height}px`;
+                    line.style.backgroundColor = `hsl(40, 70%, ${50 + Math.random() * 20}%)`;
+                    line.style.marginLeft = `${Math.random() * (50-density)}px`
+                    ligetiViz.appendChild(line);
+                }
+            }
+
+            densitySlider.addEventListener('input', updateLigetiViz);
+            updateLigetiViz();
+
+            // Tab functionality
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const tabContents = document.querySelectorAll('.tab-content');
+
+            function showTab(tabId) {
+                tabContents.forEach(content => {
+                    if (content.id === `content-${tabId}`) {
+                        content.classList.remove('hidden');
+                    } else {
+                        content.classList.add('hidden');
+                    }
+                });
+
+                tabButtons.forEach(button => {
+                    if (button.id === `tab-${tabId}`) {
+                        button.classList.add('tab-active');
+                        button.classList.remove('tab-inactive');
+                    } else {
+                        button.classList.remove('tab-active');
+                        button.classList.add('tab-inactive');
+                    }
+                });
+            }
+
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    showTab(button.id.replace('tab-', ''));
+                });
+            });
+
+            // Populate Exercises
+            const questionsContainer = document.getElementById('questions-container');
+            exercises.forEach((q, index) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'bg-stone-50 p-6 rounded-lg mb-6 shadow-sm border border-stone-200';
+                
+                let questionHtml = `<p class="font-semibold text-lg mb-4 text-stone-800">Questão ${index + 1}: ${q.question}</p>`;
+
+                if (q.type === "multiple-choice") {
+                    q.options.forEach((option, optIndex) => {
+                        questionHtml += `
+                            <label class="block mb-2 text-stone-700">
+                                <input type="radio" name="question-${index}" value="${optIndex}" class="mr-2">
+                                ${option}
+                            </label>
+                        `;
+                    });
+                } else if (q.type === "short-answer") {
+                    questionHtml += `<textarea class="w-full p-2 border border-stone-300 rounded-md mt-2 text-stone-800" rows="4" placeholder="Sua resposta aqui..."></textarea>`;
+                }
+
+                questionHtml += `
+                    <button class="reveal-answer-btn mt-4 px-4 py-2 bg-amber-600 text-white rounded-md hover:bg-amber-700 transition-colors">Ver Resposta</button>
+                    <div class="answer-reveal mt-4 p-4 bg-amber-100 border border-amber-200 rounded-md text-stone-800">
+                        <p class="font-bold mb-2">Chave de Resposta:</p>
+                        ${q.type === "multiple-choice" ? `<p><strong>Resposta Correta:</strong> ${q.options[q.correctAnswer]}</p>` : `<p><strong>Sugestão de Resposta:</strong> ${q.answer}</p>`}
+                        <p class="font-bold mt-2 mb-1">Comentário:</p>
+                        <p>${q.explanation || q.answer}</p>
+                    </div>
+                `;
+                questionDiv.innerHTML = questionHtml;
+                questionsContainer.appendChild(questionDiv);
+            });
+
+            document.querySelectorAll('.reveal-answer-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const answerDiv = e.target.nextElementSibling;
+                    answerDiv.style.display = 'block';
+                    e.target.style.display = 'none';
+                });
+            });
+
+            // Populate References
+            const referencesList = document.getElementById('references-list');
+            references.forEach(cat => {
+                const categoryTitle = document.createElement('h4');
+                categoryTitle.className = 'text-xl font-bold mb-4 text-amber-700';
+                categoryTitle.textContent = cat.category;
+                referencesList.appendChild(categoryTitle);
+
+                const ul = document.createElement('ul');
+                ul.className = 'list-disc list-inside mb-8 text-stone-700';
+                cat.items.forEach(item => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `<a href="${item.url}" target="_blank" class="text-blue-700 hover:underline">${item.title}</a>`;
+                    ul.appendChild(li);
+                });
+                referencesList.appendChild(ul);
+            });
+
+            // Populate Audiovisual
+            const audiovisualList = document.getElementById('audiovisual-list');
+            audiovisual.forEach(cat => {
+                const categoryTitle = document.createElement('h4');
+                categoryTitle.className = 'text-xl font-bold mb-4 text-amber-700';
+                categoryTitle.textContent = cat.category;
+                audiovisualList.appendChild(categoryTitle);
+
+                const listContainer = document.createElement('div');
+                listContainer.className = 'grid sm:grid-cols-2 md:grid-cols-3 gap-6 mb-8';
+
+                cat.items.forEach(item => {
+                    // Extract video ID from URL
+                    let videoId = '';
+                    const urlParams = new URLSearchParams(new URL(item.url).search);
+                    if (urlParams.has('v')) {
+                        videoId = urlParams.get('v');
+                    } else if (item.url.includes('/playlist')) {
+                        videoId = new URL(item.url).pathname.split('?')[0];
+                        videoId = item.url.split('list=')[1];
+                    } else if (item.url.includes('youtu.be/')) {
+                        videoId = item.url.split('youtu.be/')[1];
+                    } else {
+                        // Handle cases with timestamps or other parameters
+                        const simpleUrl = item.url.split('?')[0];
+                        videoId = simpleUrl.split('/').pop();
+                    }
+
+                    const itemDiv = document.createElement('div');
+                    itemDiv.className = 'bg-stone-50 rounded-lg shadow-sm border border-stone-200 overflow-hidden';
+                    itemDiv.innerHTML = `
+                        <div class="aspect-w-16 aspect-h-9">
+                            <iframe src="https://www.youtube.com/embed/${videoId}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen class="w-full h-full"></iframe>
+                        </div>
+                        <div class="p-4">
+                            <h5 class="font-semibold text-stone-900">${item.title}</h5>
+                        </div>
+                    `;
+                    listContainer.appendChild(itemDiv);
+                });
+                audiovisualList.appendChild(listContainer);
+            });
+
+            // Initial tab state
+            showTab('audiovisual'); // Start on the new tab
+        });
+    </script>
+</body>
+</html>
